@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>模擬市長選挙 集計結果</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+      color: #222;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      background: white;
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+    h1 {
+      font-size: 28px;
+    }
+    h2 {
+      margin-top: 36px;
+      border-left: 8px solid #1a73e8;
+      padding-left: 12px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 12px;
+      background: white;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background: #eef3fb;
+    }
+    .bar {
+      height: 22px;
+      background: #1a73e8;
+      border-radius: 4px;
+    }
+    .bar-wrap {
+      background: #e5e5e5;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .refresh {
+      margin-top: 20px;
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background: #1a73e8;
+      color: white;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>模擬市長選挙 集計結果</h1>
+    <p id="count"></p>
+    <button class="refresh" onclick="location.reload()">再読み込み</button>
+
+    <h2>候補者別得票数</h2>
+    <div id="voteResult"></div>
+
+    <h2>投票先 × 重視した情報</h2>
+    <div id="factorResult"></div>
+
+    <h2>投票先 × 怪しい情報の信用度</h2>
+    <div id="conspiracyResult"></div>
+
+    <h2>ファクトチェック閲覧 × 投票先</h2>
+    <div id="factcheckResult"></div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxXw2xq4BOvLZY5pkyiEyE03gldKZmVAuaTQ1OkgpV8r3M_V1ouYJwwJkE1FTwxD6pNpg/exec';
+
+    function loadData() {
+      const callbackName = 'callback_' + Date.now();
+
+      window[callbackName] = function(data) {
+        render(data);
+        delete window[callbackName];
+      };
+
+      const script = document.createElement('script');
+      script.src = SCRIPT_URL + '?callback=' + callbackName;
+      document.body.appendChild(script);
+    }
+
+    function countBy(data, key) {
+      const result = {};
+      data.forEach(row => {
+        const value = row[key] || '未回答';
+        result[value] = (result[value] || 0) + 1;
+      });
+      return result;
+    }
+
+    function renderSimpleTable(obj) {
+      const max = Math.max(...Object.values(obj), 1);
+      let html = '<table><tr><th>項目</th><th>人数</th><th>グラフ</th></tr>';
+      for (const [key, value] of Object.entries(obj)) {
+        const width = value / max * 100;
+        html += `
+          <tr>
+            <td>${key}</td>
+            <td>${value}</td>
+            <td>
+              <div class="bar-wrap">
+                <div class="bar" style="width:${width}%"></div>
+              </div>
+            </td>
+          </tr>`;
+      }
+      html += '</table>';
+      return html;
+    }
+
+    function crossTable(data, rowKey, colValues, extractor) {
+      const candidates = ['神崎カオル', '風間ショウ', '姫島ルイ'];
+      const table = {};
+
+      candidates.forEach(c => {
+        table[c] = {};
+        colValues.forEach(v => table[c][v] = 0);
+      });
+
+      data.forEach(row => {
+        const candidate = row[rowKey];
+        if (!table[candidate]) return;
+
+        const values = extractor(row);
+        values.forEach(v => {
+          if (table[candidate][v] !== undefined) {
+            table[candidate][v]++;
+          }
+        });
+      });
+
+      let html = '<table><tr><th>投票先</th>';
+      colValues.forEach(v => html += `<th>${v}</th>`);
+      html += '</tr>';
+
+      candidates.forEach(c => {
+        html += `<tr><th>${c}</th>`;
+        colValues.forEach(v => {
+          html += `<td>${table[c][v]}</td>`;
+        });
+        html += '</tr>';
+      });
+
+      html += '</table>';
+      return html;
+    }
+
+    function render(data) {
+      document.getElementById('count').textContent = `回答数：${data.length}件`;
+
+      const voteCounts = countBy(data, '投票先');
+      document.getElementById('voteResult').innerHTML = renderSimpleTable(voteCounts);
+
+      const factors = [
+        '候補者のプロフィール',
+        '候補者の見た目・印象',
+        '候補者の政策',
+        'SNSの動画',
+        '新聞記事・ファクトチェック',
+        '友人との会話',
+        'その他'
+      ];
+
+      document.getElementById('factorResult').innerHTML =
+        crossTable(data, '投票先', factors, row => {
+          return String(row['重視した情報'] || '')
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean);
+        });
+
+      const conspiracyLevels = [
+        'とても信用した',
+        'ある程度信用した',
+        'どちらともいえない',
+        'あまり信用しなかった',
+        'まったく信用しなかった'
+      ];
+
+      document.getElementById('conspiracyResult').innerHTML =
+        crossTable(data, '投票先', conspiracyLevels, row => [row['陰謀論信用度']]);
+
+      const factcheckViewed = [
+        '見た',
+        '見ていない'
+      ];
+
+      document.getElementById('factcheckResult').innerHTML =
+        crossTable(data, '投票先', factcheckViewed, row => [row['ファクトチェック閲覧']]);
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
