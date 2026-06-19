@@ -136,6 +136,7 @@
         <label><input type="checkbox" name="factors" value="候補者のプロフィール"> 候補者のプロフィール</label>
         <label><input type="checkbox" name="factors" value="候補者の見た目・印象"> 候補者の見た目・印象</label>
         <label><input type="checkbox" name="factors" value="候補者の政策"> 候補者の政策</label>
+        <label><input type="checkbox" name="factors" value="質疑応答での受け答え"> 質疑応答での受け答え</label>
         <label><input type="checkbox" name="factors" value="SNSの動画"> SNSの動画</label>
         <label><input type="checkbox" name="factors" value="新聞記事・ファクトチェック"> 新聞記事・ファクトチェック</label>
         <label><input type="checkbox" name="factors" value="友人との会話"> 友人との会話</label>
@@ -143,7 +144,20 @@
       </div>
 
       <div class="question">
-        <h2>3. SNS動画で広がっていた風間ショウ候補に関する怪しい情報を、どの程度信用しましたか？</h2>
+        <h2>3. そのなかで、特に重視したものを1つ選んでください。</h2>
+        <p class="note">単一選択</p>
+        <label><input type="radio" name="mainFactor" value="候補者のプロフィール" required> 候補者のプロフィール</label>
+        <label><input type="radio" name="mainFactor" value="候補者の見た目・印象"> 候補者の見た目・印象</label>
+        <label><input type="radio" name="mainFactor" value="候補者の政策"> 候補者の政策</label>
+        <label><input type="radio" name="mainFactor" value="質疑応答での受け答え"> 質疑応答での受け答え</label>
+        <label><input type="radio" name="mainFactor" value="SNSの動画"> SNSの動画</label>
+        <label><input type="radio" name="mainFactor" value="新聞記事・ファクトチェック"> 新聞記事・ファクトチェック</label>
+        <label><input type="radio" name="mainFactor" value="友人との会話"> 友人との会話</label>
+        <label><input type="radio" name="mainFactor" value="その他"> その他</label>
+      </div>
+
+      <div class="question">
+        <h2>4. SNS動画で広がっていた風間ショウ候補に関する怪しい情報を、どの程度信用しましたか？</h2>
         <label><input type="radio" name="conspiracy" value="とても信用した" required> とても信用した</label>
         <label><input type="radio" name="conspiracy" value="ある程度信用した"> ある程度信用した</label>
         <label><input type="radio" name="conspiracy" value="どちらともいえない"> どちらともいえない</label>
@@ -152,7 +166,7 @@
       </div>
 
       <div class="question">
-        <h2>4. 東西新報電子版では、以下のようなファクトチェックの特設ページを設けていました。あなたは、このファクトチェックを閲覧しましたか？</h2>
+        <h2>5. 東西新報電子版では、以下のようなファクトチェックの特設ページを設けていました。あなたは、このファクトチェックを閲覧しましたか？</h2>
 
         <img src="factcheck.png" alt="東西新報電子版のファクトチェック特設ページ" class="question-image">
 
@@ -161,7 +175,7 @@
       </div>
 
       <div class="question">
-        <h2>5. ファクトチェックは投票判断に影響しましたか？</h2>
+        <h2>6. ファクトチェックは投票判断に影響しましたか？</h2>
         <label><input type="radio" name="factcheckImpact" value="大きく影響した" required> 大きく影響した</label>
         <label><input type="radio" name="factcheckImpact" value="少し影響した"> 少し影響した</label>
         <label><input type="radio" name="factcheckImpact" value="あまり影響しなかった"> あまり影響しなかった</label>
@@ -197,6 +211,7 @@
         .join(',');
 
       data.append('factors', factors);
+      data.append('mainFactor', form.mainFactor.value);
       data.append('conspiracy', form.conspiracy.value);
       data.append('factcheckViewed', form.factcheckViewed.value);
       data.append('factcheckImpact', form.factcheckImpact.value);
