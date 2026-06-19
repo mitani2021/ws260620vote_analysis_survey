@@ -5,35 +5,65 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ミタニ市長選挙 投票後アンケート</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: system-ui, sans-serif;
       background: #f4f6f8;
       margin: 0;
-      padding: 20px;
+      padding: 16px;
       color: #222;
     }
+
     .container {
+      width: 100%;
       max-width: 720px;
-      margin: auto;
+      margin: 0 auto;
       background: white;
-      padding: 24px;
+      padding: 20px;
       border-radius: 14px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     }
+
     h1 {
       font-size: 24px;
       margin-bottom: 8px;
     }
+
+    h2 {
+      font-size: 19px;
+      line-height: 1.5;
+    }
+
     .question {
       margin-top: 24px;
       padding-top: 16px;
       border-top: 1px solid #ddd;
     }
+
     label {
       display: block;
-      margin: 10px 0;
+      margin: 12px 0;
       font-size: 16px;
+      line-height: 1.5;
     }
+
+    input {
+      margin-right: 6px;
+    }
+
+    .question-image {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      margin: 16px 0 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
     button {
       margin-top: 28px;
       width: 100%;
@@ -45,13 +75,16 @@
       background: #1a73e8;
       color: white;
     }
+
     button:disabled {
       background: #999;
     }
+
     .note {
       color: #666;
       font-size: 14px;
     }
+
     .thanks {
       display: none;
       text-align: center;
@@ -59,13 +92,36 @@
       font-weight: bold;
       padding: 40px 0;
     }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        padding: 14px;
+        border-radius: 10px;
+      }
+
+      h1 {
+        font-size: 21px;
+      }
+
+      h2 {
+        font-size: 17px;
+      }
+
+      label {
+        font-size: 15px;
+      }
+    }
   </style>
 </head>
+
 <body>
   <div class="container">
     <form id="surveyForm">
       <h1>ミタニ市長選挙 投票後アンケート</h1>
-      <p class="note"></p>
 
       <div class="question">
         <h2>1. あなたは誰に投票しましたか？</h2>
@@ -94,14 +150,16 @@
         <label><input type="radio" name="conspiracy" value="あまり信用しなかった"> あまり信用しなかった</label>
         <label><input type="radio" name="conspiracy" value="まったく信用しなかった"> まったく信用しなかった</label>
       </div>
-      
+
       <div class="question">
         <h2>4. 東西新報電子版では、以下のようなファクトチェックの特設ページを設けていました。あなたは、このファクトチェックを閲覧しましたか？</h2>
+
         <img src="factcheck.png" alt="東西新報電子版のファクトチェック特設ページ" class="question-image">
+
         <label><input type="radio" name="factcheckViewed" value="見た" required> 見た</label>
         <label><input type="radio" name="factcheckViewed" value="見ていない"> 見ていない</label>
       </div>
-      
+
       <div class="question">
         <h2>5. ファクトチェックは投票判断に影響しましたか？</h2>
         <label><input type="radio" name="factcheckImpact" value="大きく影響した" required> 大きく影響した</label>
