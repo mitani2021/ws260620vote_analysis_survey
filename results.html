@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ミタニ市長選挙 集計結果</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: system-ui, sans-serif;
       background: #f4f6f8;
@@ -12,46 +16,34 @@
       padding: 20px;
       color: #222;
     }
+
     .container {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: auto;
       background: white;
       padding: 24px;
       border-radius: 14px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     }
+
     h1 {
       font-size: 28px;
     }
+
     h2 {
-      margin-top: 36px;
+      margin-top: 40px;
       border-left: 8px solid #1a73e8;
       padding-left: 12px;
+      font-size: 24px;
     }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 12px;
-      background: white;
+
+    h3 {
+      margin-top: 28px;
+      font-size: 19px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 6px;
     }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: center;
-    }
-    th {
-      background: #eef3fb;
-    }
-    .bar {
-      height: 22px;
-      background: #1a73e8;
-      border-radius: 4px;
-    }
-    .bar-wrap {
-      background: #e5e5e5;
-      border-radius: 4px;
-      overflow: hidden;
-    }
+
     .refresh {
       margin-top: 20px;
       padding: 12px 20px;
@@ -61,19 +53,134 @@
       background: #1a73e8;
       color: white;
       font-weight: bold;
+      cursor: pointer;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 720px;
+      background: white;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #eef3fb;
+    }
+
+    .ranking-block {
+      margin-top: 18px;
+      padding: 16px;
+      background: #fafafa;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+    }
+
+    .ranking-title {
+      font-weight: bold;
+      margin-bottom: 12px;
+      font-size: 17px;
+    }
+
+    .rank-row {
+      display: grid;
+      grid-template-columns: 170px 1fr 50px;
+      gap: 10px;
+      align-items: center;
+      margin: 10px 0;
+    }
+
+    .rank-label {
+      font-size: 15px;
+    }
+
+    .bar-wrap {
+      background: #e5e5e5;
+      border-radius: 999px;
+      overflow: hidden;
+      height: 24px;
+    }
+
+    .bar {
+      height: 100%;
+      background: #1a73e8;
+      border-radius: 999px;
+      min-width: 0;
+    }
+
+    .rank-value {
+      text-align: right;
+      font-weight: bold;
+    }
+
+    .candidate-k {
+      background: #1a73e8;
+    }
+
+    .candidate-f {
+      background: #e8710a;
+    }
+
+    .candidate-h {
+      background: #188038;
+    }
+
+    .note {
+      color: #666;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        padding: 14px;
+      }
+
+      h1 {
+        font-size: 23px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      .rank-row {
+        grid-template-columns: 120px 1fr 40px;
+      }
+
+      .rank-label {
+        font-size: 14px;
+      }
     }
   </style>
 </head>
+
 <body>
   <div class="container">
     <h1>ミタニ市長選挙 集計結果</h1>
-    <p id="count"></p>
+    <p id="count">読み込み中...</p>
     <button class="refresh" onclick="location.reload()">再読み込み</button>
 
     <h2>候補者別得票数</h2>
     <div id="voteResult"></div>
 
     <h2>投票先 × 重視した情報</h2>
+    <p class="note">上段にクロス表、下段にランキング形式のグラフを表示します。</p>
     <div id="factorResult"></div>
 
     <h2>投票先 × 怪しい情報の信用度</h2>
@@ -85,6 +192,14 @@
 
   <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxXw2xq4BOvLZY5pkyiEyE03gldKZmVAuaTQ1OkgpV8r3M_V1ouYJwwJkE1FTwxD6pNpg/exec';
+
+    const candidates = ['神崎カオル', '風間ショウ', '姫島ルイ'];
+
+    const candidateClass = {
+      '神崎カオル': 'candidate-k',
+      '風間ショウ': 'candidate-f',
+      '姫島ルイ': 'candidate-h'
+    };
 
     function loadData() {
       const callbackName = 'callback_' + Date.now();
@@ -108,60 +223,133 @@
       return result;
     }
 
-    function renderSimpleTable(obj) {
-      const max = Math.max(...Object.values(obj), 1);
-      let html = '<table><tr><th>項目</th><th>人数</th><th>グラフ</th></tr>';
-      for (const [key, value] of Object.entries(obj)) {
-        const width = value / max * 100;
-        html += `
-          <tr>
-            <td>${key}</td>
-            <td>${value}</td>
-            <td>
-              <div class="bar-wrap">
-                <div class="bar" style="width:${width}%"></div>
-              </div>
-            </td>
-          </tr>`;
-      }
-      html += '</table>';
-      return html;
-    }
-
-    function crossTable(data, rowKey, colValues, extractor) {
-      const candidates = ['神崎カオル', '風間ショウ', '姫島ルイ'];
+    function makeCrossData(data, colValues, extractor) {
       const table = {};
 
-      candidates.forEach(c => {
-        table[c] = {};
-        colValues.forEach(v => table[c][v] = 0);
+      candidates.forEach(candidate => {
+        table[candidate] = {};
+        colValues.forEach(value => {
+          table[candidate][value] = 0;
+        });
       });
 
       data.forEach(row => {
-        const candidate = row[rowKey];
+        const candidate = row['投票先'];
         if (!table[candidate]) return;
 
         const values = extractor(row);
-        values.forEach(v => {
-          if (table[candidate][v] !== undefined) {
-            table[candidate][v]++;
+        values.forEach(value => {
+          if (table[candidate][value] !== undefined) {
+            table[candidate][value]++;
           }
         });
       });
 
-      let html = '<table><tr><th>投票先</th>';
-      colValues.forEach(v => html += `<th>${v}</th>`);
+      return table;
+    }
+
+    function renderCrossTable(table, colValues) {
+      let html = '<div class="table-wrap">';
+      html += '<table>';
+      html += '<tr><th>投票先</th>';
+
+      colValues.forEach(value => {
+        html += `<th>${value}</th>`;
+      });
+
       html += '</tr>';
 
-      candidates.forEach(c => {
-        html += `<tr><th>${c}</th>`;
-        colValues.forEach(v => {
-          html += `<td>${table[c][v]}</td>`;
+      candidates.forEach(candidate => {
+        html += `<tr><th>${candidate}</th>`;
+        colValues.forEach(value => {
+          html += `<td>${table[candidate][value]}</td>`;
         });
         html += '</tr>';
       });
 
-      html += '</table>';
+      html += '</table></div>';
+      return html;
+    }
+
+    function renderCandidateRanking(title, obj) {
+      const entries = Object.entries(obj).sort((a, b) => b[1] - a[1]);
+      const max = Math.max(...entries.map(e => e[1]), 1);
+
+      let html = `<div class="ranking-block">`;
+      html += `<div class="ranking-title">${title}</div>`;
+
+      entries.forEach(([label, value]) => {
+        const width = value === 0 ? 0 : Math.max((value / max) * 100, 4);
+        const cls = candidateClass[label] || '';
+        html += `
+          <div class="rank-row">
+            <div class="rank-label">${label}</div>
+            <div class="bar-wrap">
+              <div class="bar ${cls}" style="width:${width}%"></div>
+            </div>
+            <div class="rank-value">${value}</div>
+          </div>
+        `;
+      });
+
+      html += '</div>';
+      return html;
+    }
+
+    function renderItemRankings(table, colValues, titlePrefix) {
+      let html = '';
+
+      colValues.forEach(value => {
+        const obj = {};
+        candidates.forEach(candidate => {
+          obj[candidate] = table[candidate][value];
+        });
+
+        html += renderCandidateRanking(`${titlePrefix}：${value}`, obj);
+      });
+
+      return html;
+    }
+
+    function renderVoteRanking(voteCounts) {
+      const obj = {};
+      candidates.forEach(candidate => {
+        obj[candidate] = voteCounts[candidate] || 0;
+      });
+      return renderCandidateRanking('候補者別得票数', obj);
+    }
+
+    function renderFactorByCandidateRanking(table, factors) {
+      let html = '<h3>候補者ごとに見た「重視した情報」ランキング</h3>';
+
+      candidates.forEach(candidate => {
+        const obj = {};
+        factors.forEach(factor => {
+          obj[factor] = table[candidate][factor];
+        });
+
+        const entries = Object.entries(obj).sort((a, b) => b[1] - a[1]);
+        const max = Math.max(...entries.map(e => e[1]), 1);
+
+        html += `<div class="ranking-block">`;
+        html += `<div class="ranking-title">${candidate}に投票した人が重視した情報</div>`;
+
+        entries.forEach(([label, value]) => {
+          const width = value === 0 ? 0 : Math.max((value / max) * 100, 4);
+          html += `
+            <div class="rank-row">
+              <div class="rank-label">${label}</div>
+              <div class="bar-wrap">
+                <div class="bar ${candidateClass[candidate]}" style="width:${width}%"></div>
+              </div>
+              <div class="rank-value">${value}</div>
+            </div>
+          `;
+        });
+
+        html += '</div>';
+      });
+
       return html;
     }
 
@@ -169,7 +357,7 @@
       document.getElementById('count').textContent = `回答数：${data.length}件`;
 
       const voteCounts = countBy(data, '投票先');
-      document.getElementById('voteResult').innerHTML = renderSimpleTable(voteCounts);
+      document.getElementById('voteResult').innerHTML = renderVoteRanking(voteCounts);
 
       const factors = [
         '候補者のプロフィール',
@@ -181,13 +369,19 @@
         'その他'
       ];
 
+      const factorTable = makeCrossData(data, factors, row => {
+        return String(row['重視した情報'] || '')
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean);
+      });
+
       document.getElementById('factorResult').innerHTML =
-        crossTable(data, '投票先', factors, row => {
-          return String(row['重視した情報'] || '')
-            .split(',')
-            .map(s => s.trim())
-            .filter(Boolean);
-        });
+        '<h3>クロス表</h3>' +
+        renderCrossTable(factorTable, factors) +
+        '<h3>情報項目ごとに見た投票先ランキング</h3>' +
+        renderItemRankings(factorTable, factors, '重視した情報') +
+        renderFactorByCandidateRanking(factorTable, factors);
 
       const conspiracyLevels = [
         'とても信用した',
@@ -197,16 +391,30 @@
         'まったく信用しなかった'
       ];
 
+      const conspiracyTable = makeCrossData(data, conspiracyLevels, row => {
+        return [row['陰謀論信用度']];
+      });
+
       document.getElementById('conspiracyResult').innerHTML =
-        crossTable(data, '投票先', conspiracyLevels, row => [row['陰謀論信用度']]);
+        '<h3>クロス表</h3>' +
+        renderCrossTable(conspiracyTable, conspiracyLevels) +
+        '<h3>信用度ごとに見た投票先ランキング</h3>' +
+        renderItemRankings(conspiracyTable, conspiracyLevels, '怪しい情報の信用度');
 
       const factcheckViewed = [
         '見た',
         '見ていない'
       ];
 
+      const factcheckTable = makeCrossData(data, factcheckViewed, row => {
+        return [row['ファクトチェック閲覧']];
+      });
+
       document.getElementById('factcheckResult').innerHTML =
-        crossTable(data, '投票先', factcheckViewed, row => [row['ファクトチェック閲覧']]);
+        '<h3>クロス表</h3>' +
+        renderCrossTable(factcheckTable, factcheckViewed) +
+        '<h3>閲覧状況ごとに見た投票先ランキング</h3>' +
+        renderItemRankings(factcheckTable, factcheckViewed, 'ファクトチェック閲覧');
     }
 
     loadData();
