@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ミタニ市長選挙 投票ページ</title>
+  <title>ミタニ市長選挙 投票・出口調査</title>
+
   <style>
     * { box-sizing: border-box; }
 
@@ -25,10 +26,20 @@
       box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     }
 
-    h1 { font-size: 24px; margin-bottom: 8px; }
-    h2 { font-size: 19px; line-height: 1.5; }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
 
-    .lead { color: #555; line-height: 1.7; }
+    h2 {
+      font-size: 19px;
+      line-height: 1.5;
+    }
+
+    .lead {
+      color: #555;
+      line-height: 1.8;
+    }
 
     .question {
       margin-top: 24px;
@@ -43,9 +54,12 @@
       line-height: 1.5;
     }
 
-    input { margin-right: 6px; }
+    input {
+      margin-right: 6px;
+    }
 
     .question-image {
+      display: block;
       width: 100%;
       height: auto;
       margin: 16px 0 20px;
@@ -65,14 +79,18 @@
       color: white;
     }
 
-    button:disabled { background: #999; }
+    button:disabled {
+      background: #999;
+    }
 
     .note {
       color: #666;
       font-size: 14px;
     }
 
-    .hidden { display: none; }
+    .hidden {
+      display: none;
+    }
 
     .info-box {
       background: #eef4ff;
@@ -84,6 +102,15 @@
       line-height: 1.7;
     }
 
+    .explain-box {
+      background: #fff8e1;
+      border-left: 5px solid #fbbc04;
+      padding: 14px;
+      border-radius: 8px;
+      margin: 18px 0;
+      line-height: 1.8;
+    }
+
     .thanks {
       text-align: center;
       font-size: 20px;
@@ -93,11 +120,26 @@
     }
 
     @media (max-width: 480px) {
-      body { padding: 10px; }
-      .container { padding: 14px; border-radius: 10px; }
-      h1 { font-size: 21px; }
-      h2 { font-size: 17px; }
-      label { font-size: 15px; }
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        padding: 14px;
+        border-radius: 10px;
+      }
+
+      h1 {
+        font-size: 21px;
+      }
+
+      h2 {
+        font-size: 17px;
+      }
+
+      label {
+        font-size: 15px;
+      }
     }
   </style>
 </head>
@@ -105,9 +147,9 @@
 <body>
   <div class="container">
 
-    <!-- 画面1：地区選択 -->
     <section id="districtSection">
       <h1>ミタニ市長選挙 投票ページ</h1>
+
       <p class="lead">
         まず、あなたに割り当てられた地区を選んでください。<br>
         その後、投票に進みます。
@@ -125,7 +167,6 @@
       </form>
     </section>
 
-    <!-- 画面2：投票 -->
     <section id="voteSection" class="hidden">
       <h1>ミタニ市長選挙 投票ページ</h1>
 
@@ -143,13 +184,19 @@
       </form>
     </section>
 
-    <!-- 画面3：出口調査 -->
     <section id="surveySection" class="hidden">
-      <h1>ミタニ市長選挙 投票後アンケート</h1>
+      <h1>ミタニ市長選挙 出口調査</h1>
 
       <p class="lead">
-        投票ありがとうございました。続いて、あなたが投票先を決めるうえで何を重視したかを回答してください。
+        あなたは、投票を終えたところ、東西新報社の記者に呼び止められました。<br>
+        そして、今回の市長選挙について、以下の出口調査への回答を依頼されました。
       </p>
+
+      <div class="explain-box">
+        <strong>出口調査とは？</strong><br>
+        出口調査とは、投票を終えた人に対して、どの候補者に投票したか、何を重視して投票したかなどをたずねる調査です。<br>
+        選挙の結果を予測したり、有権者がどのような理由で投票したのかを分析したりするために行われます。
+      </div>
 
       <div class="info-box" id="surveyDisplay"></div>
 
@@ -191,7 +238,9 @@
 
         <div class="question">
           <h2>4. 東西新報電子版のファクトチェックを閲覧しましたか？</h2>
+
           <img src="factcheck.png" alt="東西新報電子版のファクトチェック特設ページ" class="question-image">
+
           <label><input type="radio" name="factcheckViewed" value="見た" required> 見た</label>
           <label><input type="radio" name="factcheckViewed" value="見ていない"> 見ていない</label>
         </div>
@@ -205,14 +254,13 @@
           <label><input type="radio" name="factcheckImpact" value="見ていない"> 見ていない</label>
         </div>
 
-        <button type="submit" id="surveyBtn">回答を送信する</button>
+        <button type="submit" id="surveyBtn">出口調査に回答する</button>
       </form>
     </section>
 
-    <!-- 完了画面 -->
     <section id="thanksSection" class="hidden">
       <div class="thanks">
-        投票とアンケートへの回答ありがとうございました。<br>
+        投票と出口調査への回答ありがとうございました。<br>
         画面を閉じてください。
       </div>
     </section>
@@ -318,7 +366,7 @@
       }).catch(() => {
         alert('送信に失敗しました。もう一度試してください。');
         surveyBtn.disabled = false;
-        surveyBtn.textContent = '回答を送信する';
+        surveyBtn.textContent = '出口調査に回答する';
       });
     });
   </script>
