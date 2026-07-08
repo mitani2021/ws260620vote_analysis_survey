@@ -4,10 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ミタニ市長選挙 投票後アンケート</title>
+
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       font-family: system-ui, sans-serif;
@@ -37,6 +36,21 @@
       line-height: 1.5;
     }
 
+    .lead {
+      color: #555;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .vote-box {
+      background: #eef4ff;
+      border-left: 5px solid #1a73e8;
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin: 18px 0;
+      font-weight: bold;
+    }
+
     .question {
       margin-top: 24px;
       padding-top: 16px;
@@ -50,14 +64,11 @@
       line-height: 1.5;
     }
 
-    input {
-      margin-right: 6px;
-    }
+    input { margin-right: 6px; }
 
     .question-image {
       display: block;
       width: 100%;
-      max-width: 100%;
       height: auto;
       margin: 16px 0 20px;
       border: 1px solid #ccc;
@@ -76,9 +87,7 @@
       color: white;
     }
 
-    button:disabled {
-      background: #999;
-    }
+    button:disabled { background: #999; }
 
     .note {
       color: #666;
@@ -93,45 +102,47 @@
       padding: 40px 0;
     }
 
+    .error {
+      display: none;
+      color: #b00020;
+      background: #fff0f0;
+      border: 1px solid #f0b4b4;
+      padding: 14px;
+      border-radius: 8px;
+      margin-top: 16px;
+      line-height: 1.6;
+    }
+
     @media (max-width: 480px) {
-      body {
-        padding: 10px;
-      }
-
-      .container {
-        padding: 14px;
-        border-radius: 10px;
-      }
-
-      h1 {
-        font-size: 21px;
-      }
-
-      h2 {
-        font-size: 17px;
-      }
-
-      label {
-        font-size: 15px;
-      }
+      body { padding: 10px; }
+      .container { padding: 14px; border-radius: 10px; }
+      h1 { font-size: 21px; }
+      h2 { font-size: 17px; }
+      label { font-size: 15px; }
     }
   </style>
 </head>
 
 <body>
   <div class="container">
+
     <form id="surveyForm">
       <h1>ミタニ市長選挙 投票後アンケート</h1>
 
-      <div class="question">
-        <h2>1. あなたは誰に投票しましたか？</h2>
-        <label><input type="radio" name="vote" value="神崎カオル" required> 神崎カオル</label>
-        <label><input type="radio" name="vote" value="風間ショウ"> 風間ショウ</label>
-        <label><input type="radio" name="vote" value="姫島ルイ"> 姫島ルイ</label>
+      <p class="lead">
+        投票ありがとうございました。続いて、あなたが投票先を決めるうえで何を重視したかを回答してください。
+      </p>
+
+      <div class="vote-box" id="voteDisplay">
+        あなたの投票先：読み込み中...
+      </div>
+
+      <div class="error" id="errorBox">
+        投票情報を確認できませんでした。投票ページから続けてアクセスしてください。
       </div>
 
       <div class="question">
-        <h2>2. 投票先を決めるうえで、何を重視しましたか？</h2>
+        <h2>1. 投票先を決めるうえで、何を重視しましたか？</h2>
         <p class="note">複数選択可</p>
         <label><input type="checkbox" name="factors" value="候補者のプロフィール"> 候補者のプロフィール</label>
         <label><input type="checkbox" name="factors" value="候補者の見た目・印象"> 候補者の見た目・印象</label>
@@ -144,7 +155,7 @@
       </div>
 
       <div class="question">
-        <h2>3. そのなかで、特に重視したものを1つ選んでください。</h2>
+        <h2>2. そのなかで、特に重視したものを1つ選んでください。</h2>
         <p class="note">単一選択</p>
         <label><input type="radio" name="mainFactor" value="候補者のプロフィール" required> 候補者のプロフィール</label>
         <label><input type="radio" name="mainFactor" value="候補者の見た目・印象"> 候補者の見た目・印象</label>
@@ -157,7 +168,7 @@
       </div>
 
       <div class="question">
-        <h2>4. SNS動画で広がっていた風間ショウ候補に関する怪しい情報を、どの程度信用しましたか？</h2>
+        <h2>3. SNS動画で広がっていた風間ショウ候補に関する怪しい情報を、どの程度信用しましたか？</h2>
         <label><input type="radio" name="conspiracy" value="とても信用した" required> とても信用した</label>
         <label><input type="radio" name="conspiracy" value="ある程度信用した"> ある程度信用した</label>
         <label><input type="radio" name="conspiracy" value="どちらともいえない"> どちらともいえない</label>
@@ -166,7 +177,7 @@
       </div>
 
       <div class="question">
-        <h2>5. 東西新報電子版では、以下のようなファクトチェックの特設ページを設けていました。あなたは、このファクトチェックを閲覧しましたか？</h2>
+        <h2>4. 東西新報電子版のファクトチェックを閲覧しましたか？</h2>
 
         <img src="factcheck.png" alt="東西新報電子版のファクトチェック特設ページ" class="question-image">
 
@@ -175,7 +186,7 @@
       </div>
 
       <div class="question">
-        <h2>6. 東西新報電子版のファクトチェックをご覧になった方に質問します。ファクトチェックの情報は投票判断に影響しましたか？（ご覧になっていない方は、「見ていない」と回答してください）</h2>
+        <h2>5. ファクトチェックの情報は投票判断に影響しましたか？</h2>
         <label><input type="radio" name="factcheckImpact" value="大きく影響した" required> 大きく影響した</label>
         <label><input type="radio" name="factcheckImpact" value="少し影響した"> 少し影響した</label>
         <label><input type="radio" name="factcheckImpact" value="あまり影響しなかった"> あまり影響しなかった</label>
@@ -194,19 +205,43 @@
   <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxXw2xq4BOvLZY5pkyiEyE03gldKZmVAuaTQ1OkgpV8r3M_V1ouYJwwJkE1FTwxD6pNpg/exec';
 
+    const params = new URLSearchParams(window.location.search);
+    const voteId = params.get('voteId');
+    const vote = params.get('vote');
+
+    const voteDisplay = document.getElementById('voteDisplay');
+    const errorBox = document.getElementById('errorBox');
+    const form = document.getElementById('surveyForm');
+
+    if (!voteId || !vote) {
+      voteDisplay.style.display = 'none';
+      errorBox.style.display = 'block';
+      form.querySelector('button').disabled = true;
+    } else {
+      voteDisplay.textContent = `あなたの投票先：${vote}`;
+    }
+
     document.getElementById('surveyForm').addEventListener('submit', function(e) {
       e.preventDefault();
+
+      const checkedFactors = Array.from(form.querySelectorAll('input[name="factors"]:checked'));
+
+      if (checkedFactors.length === 0) {
+        alert('「投票先を決めるうえで重視したこと」を1つ以上選んでください。');
+        return;
+      }
 
       const submitBtn = document.getElementById('submitBtn');
       submitBtn.disabled = true;
       submitBtn.textContent = '送信中...';
 
-      const form = e.target;
       const data = new URLSearchParams();
 
-      data.append('vote', form.vote.value);
+      data.append('type', 'exitSurvey');
+      data.append('voteId', voteId);
+      data.append('vote', vote);
 
-      const factors = Array.from(form.querySelectorAll('input[name="factors"]:checked'))
+      const factors = checkedFactors
         .map(el => el.value)
         .join(',');
 
