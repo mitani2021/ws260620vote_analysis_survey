@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ミタニ市長選挙 投票後アンケート</title>
-
+  <title>ミタニ市長選挙 投票ページ</title>
   <style>
     * { box-sizing: border-box; }
 
@@ -26,29 +25,12 @@
       box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     }
 
-    h1 {
-      font-size: 24px;
-      margin-bottom: 8px;
-    }
-
-    h2 {
-      font-size: 19px;
-      line-height: 1.5;
-    }
+    h1 { font-size: 24px; margin-bottom: 8px; }
+    h2 { font-size: 19px; line-height: 1.5; }
 
     .lead {
       color: #555;
       line-height: 1.7;
-      margin-bottom: 20px;
-    }
-
-    .vote-box {
-      background: #eef4ff;
-      border-left: 5px solid #1a73e8;
-      padding: 12px 14px;
-      border-radius: 8px;
-      margin: 18px 0;
-      font-weight: bold;
     }
 
     .question {
@@ -67,7 +49,6 @@
     input { margin-right: 6px; }
 
     .question-image {
-      display: block;
       width: 100%;
       height: auto;
       margin: 16px 0 20px;
@@ -94,23 +75,22 @@
       font-size: 14px;
     }
 
+    .hidden { display: none; }
+
+    .vote-box {
+      background: #eef4ff;
+      border-left: 5px solid #1a73e8;
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin: 18px 0;
+      font-weight: bold;
+    }
+
     .thanks {
-      display: none;
       text-align: center;
       font-size: 20px;
       font-weight: bold;
       padding: 40px 0;
-    }
-
-    .error {
-      display: none;
-      color: #b00020;
-      background: #fff0f0;
-      border: 1px solid #f0b4b4;
-      padding: 14px;
-      border-radius: 8px;
-      margin-top: 16px;
-      line-height: 1.6;
     }
 
     @media (max-width: 480px) {
@@ -126,103 +106,149 @@
 <body>
   <div class="container">
 
-    <form id="surveyForm">
+    <!-- 投票画面 -->
+    <section id="voteSection">
+      <h1>ミタニ市長選挙 投票ページ</h1>
+      <p class="lead">
+        あなたが支持する候補者を1人選び、投票してください。<br>
+        投票後、そのまま投票後アンケートに進みます。
+      </p>
+
+      <form id="voteForm">
+        <div class="question">
+          <h2>あなたは誰に投票しますか？</h2>
+          <label><input type="radio" name="vote" value="神崎カオル" required> 神崎カオル</label>
+          <label><input type="radio" name="vote" value="風間ショウ"> 風間ショウ</label>
+          <label><input type="radio" name="vote" value="姫島ルイ"> 姫島ルイ</label>
+        </div>
+
+        <button type="submit" id="voteBtn">投票する</button>
+      </form>
+    </section>
+
+    <!-- 出口調査画面 -->
+    <section id="surveySection" class="hidden">
       <h1>ミタニ市長選挙 投票後アンケート</h1>
 
       <p class="lead">
         投票ありがとうございました。続いて、あなたが投票先を決めるうえで何を重視したかを回答してください。
       </p>
 
-      <div class="vote-box" id="voteDisplay">
-        あなたの投票先：読み込み中...
+      <div class="vote-box" id="voteDisplay"></div>
+
+      <form id="surveyForm">
+        <div class="question">
+          <h2>1. 投票先を決めるうえで、何を重視しましたか？</h2>
+          <p class="note">複数選択可</p>
+          <label><input type="checkbox" name="factors" value="候補者のプロフィール"> 候補者のプロフィール</label>
+          <label><input type="checkbox" name="factors" value="候補者の見た目・印象"> 候補者の見た目・印象</label>
+          <label><input type="checkbox" name="factors" value="候補者の政策"> 候補者の政策</label>
+          <label><input type="checkbox" name="factors" value="質疑応答での受け答え"> 質疑応答での受け答え</label>
+          <label><input type="checkbox" name="factors" value="SNSの動画"> SNSの動画</label>
+          <label><input type="checkbox" name="factors" value="新聞記事・ファクトチェック"> 新聞記事・ファクトチェック</label>
+          <label><input type="checkbox" name="factors" value="友人との会話"> 友人との会話</label>
+          <label><input type="checkbox" name="factors" value="その他"> その他</label>
+        </div>
+
+        <div class="question">
+          <h2>2. そのなかで、特に重視したものを1つ選んでください。</h2>
+          <p class="note">単一選択</p>
+          <label><input type="radio" name="mainFactor" value="候補者のプロフィール" required> 候補者のプロフィール</label>
+          <label><input type="radio" name="mainFactor" value="候補者の見た目・印象"> 候補者の見た目・印象</label>
+          <label><input type="radio" name="mainFactor" value="候補者の政策"> 候補者の政策</label>
+          <label><input type="radio" name="mainFactor" value="質疑応答での受け答え"> 質疑応答での受け答え</label>
+          <label><input type="radio" name="mainFactor" value="SNSの動画"> SNSの動画</label>
+          <label><input type="radio" name="mainFactor" value="新聞記事・ファクトチェック"> 新聞記事・ファクトチェック</label>
+          <label><input type="radio" name="mainFactor" value="友人との会話"> 友人との会話</label>
+          <label><input type="radio" name="mainFactor" value="その他"> その他</label>
+        </div>
+
+        <div class="question">
+          <h2>3. SNS動画で広がっていた風間ショウ候補に関する怪しい情報を、どの程度信用しましたか？</h2>
+          <label><input type="radio" name="conspiracy" value="とても信用した" required> とても信用した</label>
+          <label><input type="radio" name="conspiracy" value="ある程度信用した"> ある程度信用した</label>
+          <label><input type="radio" name="conspiracy" value="どちらともいえない"> どちらともいえない</label>
+          <label><input type="radio" name="conspiracy" value="あまり信用しなかった"> あまり信用しなかった</label>
+          <label><input type="radio" name="conspiracy" value="まったく信用しなかった"> まったく信用しなかった</label>
+        </div>
+
+        <div class="question">
+          <h2>4. 東西新報電子版のファクトチェックを閲覧しましたか？</h2>
+
+          <img src="factcheck.png" alt="東西新報電子版のファクトチェック特設ページ" class="question-image">
+
+          <label><input type="radio" name="factcheckViewed" value="見た" required> 見た</label>
+          <label><input type="radio" name="factcheckViewed" value="見ていない"> 見ていない</label>
+        </div>
+
+        <div class="question">
+          <h2>5. ファクトチェックの情報は投票判断に影響しましたか？</h2>
+          <label><input type="radio" name="factcheckImpact" value="大きく影響した" required> 大きく影響した</label>
+          <label><input type="radio" name="factcheckImpact" value="少し影響した"> 少し影響した</label>
+          <label><input type="radio" name="factcheckImpact" value="あまり影響しなかった"> あまり影響しなかった</label>
+          <label><input type="radio" name="factcheckImpact" value="まったく影響しなかった"> まったく影響しなかった</label>
+          <label><input type="radio" name="factcheckImpact" value="見ていない"> 見ていない</label>
+        </div>
+
+        <button type="submit" id="surveyBtn">回答を送信する</button>
+      </form>
+    </section>
+
+    <!-- 完了画面 -->
+    <section id="thanksSection" class="hidden">
+      <div class="thanks">
+        投票とアンケートへの回答ありがとうございました。
       </div>
+    </section>
 
-      <div class="error" id="errorBox">
-        投票情報を確認できませんでした。投票ページから続けてアクセスしてください。
-      </div>
-
-      <div class="question">
-        <h2>1. 投票先を決めるうえで、何を重視しましたか？</h2>
-        <p class="note">複数選択可</p>
-        <label><input type="checkbox" name="factors" value="候補者のプロフィール"> 候補者のプロフィール</label>
-        <label><input type="checkbox" name="factors" value="候補者の見た目・印象"> 候補者の見た目・印象</label>
-        <label><input type="checkbox" name="factors" value="候補者の政策"> 候補者の政策</label>
-        <label><input type="checkbox" name="factors" value="質疑応答での受け答え"> 質疑応答での受け答え</label>
-        <label><input type="checkbox" name="factors" value="SNSの動画"> SNSの動画</label>
-        <label><input type="checkbox" name="factors" value="新聞記事・ファクトチェック"> 新聞記事・ファクトチェック</label>
-        <label><input type="checkbox" name="factors" value="友人との会話"> 友人との会話</label>
-        <label><input type="checkbox" name="factors" value="その他"> その他</label>
-      </div>
-
-      <div class="question">
-        <h2>2. そのなかで、特に重視したものを1つ選んでください。</h2>
-        <p class="note">単一選択</p>
-        <label><input type="radio" name="mainFactor" value="候補者のプロフィール" required> 候補者のプロフィール</label>
-        <label><input type="radio" name="mainFactor" value="候補者の見た目・印象"> 候補者の見た目・印象</label>
-        <label><input type="radio" name="mainFactor" value="候補者の政策"> 候補者の政策</label>
-        <label><input type="radio" name="mainFactor" value="質疑応答での受け答え"> 質疑応答での受け答え</label>
-        <label><input type="radio" name="mainFactor" value="SNSの動画"> SNSの動画</label>
-        <label><input type="radio" name="mainFactor" value="新聞記事・ファクトチェック"> 新聞記事・ファクトチェック</label>
-        <label><input type="radio" name="mainFactor" value="友人との会話"> 友人との会話</label>
-        <label><input type="radio" name="mainFactor" value="その他"> その他</label>
-      </div>
-
-      <div class="question">
-        <h2>3. SNS動画で広がっていた風間ショウ候補に関する怪しい情報を、どの程度信用しましたか？</h2>
-        <label><input type="radio" name="conspiracy" value="とても信用した" required> とても信用した</label>
-        <label><input type="radio" name="conspiracy" value="ある程度信用した"> ある程度信用した</label>
-        <label><input type="radio" name="conspiracy" value="どちらともいえない"> どちらともいえない</label>
-        <label><input type="radio" name="conspiracy" value="あまり信用しなかった"> あまり信用しなかった</label>
-        <label><input type="radio" name="conspiracy" value="まったく信用しなかった"> まったく信用しなかった</label>
-      </div>
-
-      <div class="question">
-        <h2>4. 東西新報電子版のファクトチェックを閲覧しましたか？</h2>
-
-        <img src="factcheck.png" alt="東西新報電子版のファクトチェック特設ページ" class="question-image">
-
-        <label><input type="radio" name="factcheckViewed" value="見た" required> 見た</label>
-        <label><input type="radio" name="factcheckViewed" value="見ていない"> 見ていない</label>
-      </div>
-
-      <div class="question">
-        <h2>5. ファクトチェックの情報は投票判断に影響しましたか？</h2>
-        <label><input type="radio" name="factcheckImpact" value="大きく影響した" required> 大きく影響した</label>
-        <label><input type="radio" name="factcheckImpact" value="少し影響した"> 少し影響した</label>
-        <label><input type="radio" name="factcheckImpact" value="あまり影響しなかった"> あまり影響しなかった</label>
-        <label><input type="radio" name="factcheckImpact" value="まったく影響しなかった"> まったく影響しなかった</label>
-        <label><input type="radio" name="factcheckImpact" value="見ていない"> 見ていない</label>
-      </div>
-
-      <button type="submit" id="submitBtn">回答を送信する</button>
-    </form>
-
-    <div class="thanks" id="thanks">
-      回答ありがとうございました。
-    </div>
   </div>
 
   <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxXw2xq4BOvLZY5pkyiEyE03gldKZmVAuaTQ1OkgpV8r3M_V1ouYJwwJkE1FTwxD6pNpg/exec';
 
-    const params = new URLSearchParams(window.location.search);
-    const voteId = params.get('voteId');
-    const vote = params.get('vote');
+    let voteId = '';
+    let selectedVote = '';
 
-    const voteDisplay = document.getElementById('voteDisplay');
-    const errorBox = document.getElementById('errorBox');
-    const form = document.getElementById('surveyForm');
+    const voteSection = document.getElementById('voteSection');
+    const surveySection = document.getElementById('surveySection');
+    const thanksSection = document.getElementById('thanksSection');
 
-    if (!voteId || !vote) {
-      voteDisplay.style.display = 'none';
-      errorBox.style.display = 'block';
-      form.querySelector('button').disabled = true;
-    } else {
-      voteDisplay.textContent = `あなたの投票先：${vote}`;
-    }
+    document.getElementById('voteForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const voteBtn = document.getElementById('voteBtn');
+      voteBtn.disabled = true;
+      voteBtn.textContent = '投票中...';
+
+      selectedVote = e.target.vote.value;
+      voteId = crypto.randomUUID();
+
+      const data = new URLSearchParams();
+      data.append('type', 'vote');
+      data.append('voteId', voteId);
+      data.append('vote', selectedVote);
+
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: data
+      }).then(() => {
+        document.getElementById('voteDisplay').textContent = `あなたの投票先：${selectedVote}`;
+        voteSection.classList.add('hidden');
+        surveySection.classList.remove('hidden');
+        window.scrollTo(0, 0);
+      }).catch(() => {
+        alert('投票の送信に失敗しました。もう一度試してください。');
+        voteBtn.disabled = false;
+        voteBtn.textContent = '投票する';
+      });
+    });
 
     document.getElementById('surveyForm').addEventListener('submit', function(e) {
       e.preventDefault();
+
+      const surveyBtn = document.getElementById('surveyBtn');
+      const form = e.target;
 
       const checkedFactors = Array.from(form.querySelectorAll('input[name="factors"]:checked'));
 
@@ -231,20 +257,15 @@
         return;
       }
 
-      const submitBtn = document.getElementById('submitBtn');
-      submitBtn.disabled = true;
-      submitBtn.textContent = '送信中...';
+      surveyBtn.disabled = true;
+      surveyBtn.textContent = '送信中...';
+
+      const factors = checkedFactors.map(el => el.value).join(',');
 
       const data = new URLSearchParams();
-
       data.append('type', 'exitSurvey');
       data.append('voteId', voteId);
-      data.append('vote', vote);
-
-      const factors = checkedFactors
-        .map(el => el.value)
-        .join(',');
-
+      data.append('vote', selectedVote);
       data.append('factors', factors);
       data.append('mainFactor', form.mainFactor.value);
       data.append('conspiracy', form.conspiracy.value);
@@ -256,12 +277,13 @@
         mode: 'no-cors',
         body: data
       }).then(() => {
-        form.style.display = 'none';
-        document.getElementById('thanks').style.display = 'block';
+        surveySection.classList.add('hidden');
+        thanksSection.classList.remove('hidden');
+        window.scrollTo(0, 0);
       }).catch(() => {
         alert('送信に失敗しました。もう一度試してください。');
-        submitBtn.disabled = false;
-        submitBtn.textContent = '回答を送信する';
+        surveyBtn.disabled = false;
+        surveyBtn.textContent = '回答を送信する';
       });
     });
   </script>
