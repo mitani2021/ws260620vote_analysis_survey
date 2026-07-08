@@ -28,10 +28,7 @@
     h1 { font-size: 24px; margin-bottom: 8px; }
     h2 { font-size: 19px; line-height: 1.5; }
 
-    .lead {
-      color: #555;
-      line-height: 1.7;
-    }
+    .lead { color: #555; line-height: 1.7; }
 
     .question {
       margin-top: 24px;
@@ -77,13 +74,14 @@
 
     .hidden { display: none; }
 
-    .vote-box {
+    .info-box {
       background: #eef4ff;
       border-left: 5px solid #1a73e8;
       padding: 12px 14px;
       border-radius: 8px;
       margin: 18px 0;
       font-weight: bold;
+      line-height: 1.7;
     }
 
     .thanks {
@@ -91,6 +89,7 @@
       font-size: 20px;
       font-weight: bold;
       padding: 40px 0;
+      line-height: 1.8;
     }
 
     @media (max-width: 480px) {
@@ -106,13 +105,31 @@
 <body>
   <div class="container">
 
-    <!-- 投票画面 -->
-    <section id="voteSection">
+    <!-- 画面1：地区選択 -->
+    <section id="districtSection">
       <h1>ミタニ市長選挙 投票ページ</h1>
       <p class="lead">
-        あなたが支持する候補者を1人選び、投票してください。<br>
-        投票後、そのまま投票後アンケートに進みます。
+        まず、あなたに割り当てられた地区を選んでください。<br>
+        その後、投票に進みます。
       </p>
+
+      <form id="districtForm">
+        <div class="question">
+          <h2>あなたはどの地区の住民ですか？</h2>
+          <label><input type="radio" name="district" value="X地区" required> X地区</label>
+          <label><input type="radio" name="district" value="Y地区"> Y地区</label>
+          <label><input type="radio" name="district" value="Z地区"> Z地区</label>
+        </div>
+
+        <button type="submit">投票へ進む</button>
+      </form>
+    </section>
+
+    <!-- 画面2：投票 -->
+    <section id="voteSection" class="hidden">
+      <h1>ミタニ市長選挙 投票ページ</h1>
+
+      <div class="info-box" id="districtDisplay"></div>
 
       <form id="voteForm">
         <div class="question">
@@ -126,7 +143,7 @@
       </form>
     </section>
 
-    <!-- 出口調査画面 -->
+    <!-- 画面3：出口調査 -->
     <section id="surveySection" class="hidden">
       <h1>ミタニ市長選挙 投票後アンケート</h1>
 
@@ -134,7 +151,7 @@
         投票ありがとうございました。続いて、あなたが投票先を決めるうえで何を重視したかを回答してください。
       </p>
 
-      <div class="vote-box" id="voteDisplay"></div>
+      <div class="info-box" id="surveyDisplay"></div>
 
       <form id="surveyForm">
         <div class="question">
@@ -174,9 +191,7 @@
 
         <div class="question">
           <h2>4. 東西新報電子版のファクトチェックを閲覧しましたか？</h2>
-
           <img src="factcheck.png" alt="東西新報電子版のファクトチェック特設ページ" class="question-image">
-
           <label><input type="radio" name="factcheckViewed" value="見た" required> 見た</label>
           <label><input type="radio" name="factcheckViewed" value="見ていない"> 見ていない</label>
         </div>
@@ -197,7 +212,8 @@
     <!-- 完了画面 -->
     <section id="thanksSection" class="hidden">
       <div class="thanks">
-        投票とアンケートへの回答ありがとうございました。
+        投票とアンケートへの回答ありがとうございました。<br>
+        画面を閉じてください。
       </div>
     </section>
 
@@ -207,11 +223,26 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxXw2xq4BOvLZY5pkyiEyE03gldKZmVAuaTQ1OkgpV8r3M_V1ouYJwwJkE1FTwxD6pNpg/exec';
 
     let voteId = '';
+    let selectedDistrict = '';
     let selectedVote = '';
 
+    const districtSection = document.getElementById('districtSection');
     const voteSection = document.getElementById('voteSection');
     const surveySection = document.getElementById('surveySection');
     const thanksSection = document.getElementById('thanksSection');
+
+    document.getElementById('districtForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      selectedDistrict = e.target.district.value;
+
+      document.getElementById('districtDisplay').textContent =
+        `あなたの地区：${selectedDistrict}`;
+
+      districtSection.classList.add('hidden');
+      voteSection.classList.remove('hidden');
+      window.scrollTo(0, 0);
+    });
 
     document.getElementById('voteForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -226,6 +257,7 @@
       const data = new URLSearchParams();
       data.append('type', 'vote');
       data.append('voteId', voteId);
+      data.append('district', selectedDistrict);
       data.append('vote', selectedVote);
 
       fetch(SCRIPT_URL, {
@@ -233,7 +265,9 @@
         mode: 'no-cors',
         body: data
       }).then(() => {
-        document.getElementById('voteDisplay').textContent = `あなたの投票先：${selectedVote}`;
+        document.getElementById('surveyDisplay').innerHTML =
+          `あなたの地区：${selectedDistrict}<br>あなたの投票先：${selectedVote}`;
+
         voteSection.classList.add('hidden');
         surveySection.classList.remove('hidden');
         window.scrollTo(0, 0);
@@ -265,6 +299,7 @@
       const data = new URLSearchParams();
       data.append('type', 'exitSurvey');
       data.append('voteId', voteId);
+      data.append('district', selectedDistrict);
       data.append('vote', selectedVote);
       data.append('factors', factors);
       data.append('mainFactor', form.mainFactor.value);
