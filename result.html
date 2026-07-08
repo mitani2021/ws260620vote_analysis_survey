@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ミタニ市長選挙 開票速報</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #06152b;
+      color: white;
+    }
+
+    .header {
+      background: linear-gradient(90deg, #b00020, #d50000);
+      padding: 16px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 26px;
+      letter-spacing: 0.08em;
+    }
+
+    .subheader {
+      background: #001b44;
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 15px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .winner-box {
+      background: white;
+      color: #111;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 18px;
+      text-align: center;
+      border: 5px solid #ffd54f;
+    }
+
+    .winner-label {
+      background: #d50000;
+      color: white;
+      display: inline-block;
+      padding: 6px 18px;
+      border-radius: 999px;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .winner-name {
+      font-size: 38px;
+      font-weight: 900;
+    }
+
+    .candidate {
+      background: #0b2a55;
+      border-radius: 12px;
+      margin: 14px 0;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .candidate-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .name {
+      font-size: 26px;
+      font-weight: bold;
+    }
+
+    .votes {
+      font-size: 28px;
+      font-weight: 900;
+      color: #ffd54f;
+    }
+
+    .percent {
+      font-size: 18px;
+      color: #ddd;
+      margin-left: 8px;
+    }
+
+    .bar-wrap {
+      width: 100%;
+      background: #173b70;
+      border-radius: 999px;
+      height: 26px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+
+    .bar {
+      height: 100%;
+      background: linear-gradient(90deg, #ffd54f, #ff9800);
+      width: 0%;
+      transition: width 0.8s ease;
+    }
+
+    .section-title {
+      margin-top: 28px;
+      padding: 8px 12px;
+      background: #d50000;
+      font-size: 20px;
+      font-weight: bold;
+      border-radius: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      background: white;
+      color: #111;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th {
+      background: #001b44;
+      color: white;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      font-size: 20px;
+    }
+
+    .footer {
+      margin-top: 20px;
+      color: #ccc;
+      font-size: 13px;
+      text-align: right;
+    }
+
+    @media (max-width: 600px) {
+      .header { font-size: 22px; }
+      .winner-name { font-size: 32px; }
+      .name { font-size: 22px; }
+      .votes { font-size: 24px; }
+      .candidate-top { flex-direction: column; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">ミタニ市長選挙　開票速報</div>
+
+  <div class="subheader">
+    <div>東西新報 Election News</div>
+    <div id="updated">集計中</div>
+  </div>
+
+  <div class="container">
+    <div id="loading" class="loading">開票データを読み込んでいます...</div>
+
+    <div id="resultArea" style="display:none;">
+      <div class="winner-box" id="winnerBox"></div>
+
+      <div id="candidateResults"></div>
+
+      <div class="section-title">地区別得票</div>
+      <table id="districtTable"></table>
+
+      <div class="section-title">出口調査：投票時に特に重視したもの</div>
+      <table id="factorTable"></table>
+
+      <div class="footer">
+        ※このページはワークショップ教材用の開票速報画面です。
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxXw2xq4BOvLZY5pkyiEyE03gldKZmVAuaTQ1OkgpV8r3M_V1ouYJwwJkE1FTwxD6pNpg/exec';
+
+    function loadResults() {
+      const callbackName = 'handleElectionResults_' + Date.now();
+
+      window[callbackName] = function(data) {
+        renderResults(data);
+        delete window[callbackName];
+      };
+
+      const script = document.createElement('script');
+      script.src = SCRIPT_URL + '?callback=' + callbackName;
+      document.body.appendChild(script);
+    }
+
+    function renderResults(data) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('resultArea').style.display = 'block';
+
+      document.getElementById('updated').textContent =
+        '最終更新 ' + data.updatedAt;
+
+      const totalVotes = data.totalVotes || 0;
+      const candidates = data.candidates || [];
+
+      candidates.sort((a, b) => b.votes - a.votes);
+
+      const winner = candidates[0];
+
+      document.getElementById('winnerBox').innerHTML = `
+        <div class="winner-label">当選確実</div>
+        <div class="winner-name">${winner.name}</div>
+        <div>得票数 ${winner.votes}票 ／ 得票率 ${winner.percent}%</div>
+      `;
+
+      const candidateResults = document.getElementById('candidateResults');
+      candidateResults.innerHTML = '';
+
+      candidates.forEach(c => {
+        candidateResults.innerHTML += `
+          <div class="candidate">
+            <div class="candidate-top">
+              <div class="name">${c.name}</div>
+              <div>
+                <span class="votes">${c.votes}票</span>
+                <span class="percent">${c.percent}%</span>
+              </div>
+            </div>
+            <div class="bar-wrap">
+              <div class="bar" style="width:${c.percent}%"></div>
+            </div>
+          </div>
+        `;
+      });
+
+      renderDistrictTable(data.districts);
+      renderFactorTable(data.mainFactors);
+    }
+
+    function renderDistrictTable(districts) {
+      const table = document.getElementById('districtTable');
+
+      table.innerHTML = `
+        <tr>
+          <th>地区</th>
+          <th>神崎カオル</th>
+          <th>風間ショウ</th>
+          <th>姫島ルイ</th>
+          <th>合計</th>
+        </tr>
+      `;
+
+      ['X地区', 'Y地区', 'Z地区'].forEach(d => {
+        const row = districts[d] || {};
+        table.innerHTML += `
+          <tr>
+            <td>${d}</td>
+            <td>${row['神崎カオル'] || 0}</td>
+            <td>${row['風間ショウ'] || 0}</td>
+            <td>${row['姫島ルイ'] || 0}</td>
+            <td>${row.total || 0}</td>
+          </tr>
+        `;
+      });
+    }
+
+    function renderFactorTable(mainFactors) {
+      const table = document.getElementById('factorTable');
+
+      table.innerHTML = `
+        <tr>
+          <th>重視したもの</th>
+          <th>人数</th>
+        </tr>
+      `;
+
+      Object.entries(mainFactors)
+        .sort((a, b) => b[1] - a[1])
+        .forEach(([factor, count]) => {
+          table.innerHTML += `
+            <tr>
+              <td>${factor}</td>
+              <td>${count}</td>
+            </tr>
+          `;
+        });
+    }
+
+    loadResults();
+
+    setInterval(loadResults, 10000);
+  </script>
+</body>
+</html>
